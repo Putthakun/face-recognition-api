@@ -1,0 +1,56 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.rsuser
+.idea/
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Publish
+publish/
+**/Properties/PublishProfiles/
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+appsettings.Production.json
+appsettings.Local.json
+secrets.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Rider / JetBrains
+.idea/
+
+# VS Code
+.vscode/

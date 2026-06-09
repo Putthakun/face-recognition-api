@@ -1,0 +1,9 @@
+namespace face_recognition_api.DTOs;
+
+// DTO ที่ Admin ใช้สร้าง account พนักงาน
+public class CreateUserDto
+{
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string Role { get; set; } = "Employee";
+}

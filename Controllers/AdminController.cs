@@ -7,7 +7,7 @@ namespace face_recognition_api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]  // ← ทุก endpoint ใน Controller นี้ต้องเป็น Admin เท่านั้น
+[Authorize(Roles = "Admin")]  // All endpoints in this controller require Admin role
 public class AdminController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -19,7 +19,7 @@ public class AdminController : ControllerBase
         _userRepository = userRepository;
     }
 
-    // POST /api/admin/users — สร้าง account พนักงานใหม่
+    // POST /api/admin/users — create a new employee account
     [HttpPost("users")]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserDto request)
     {
@@ -27,17 +27,17 @@ public class AdminController : ControllerBase
         return Ok(response);
     }
 
-    // GET /api/admin/users — ดูรายชื่อพนักงานทั้งหมด
+    // GET /api/admin/users — list all users
     [HttpGet("users")]
     public async Task<IActionResult> GetAllUsers()
     {
         var users = await _userRepository.GetAllAsync();
 
-        // map เป็น anonymous object เพื่อไม่ให้ PasswordHash หลุดออกไป
+        // Map to anonymous object to prevent PasswordHash from leaking
         var result = users.Select(u => new
         {
             u.Id,
-            u.Email,
+            u.EmpId,
             u.Role,
             u.CreatedAt
         });

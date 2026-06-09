@@ -3,16 +3,14 @@ using face_recognition_api.Models;
 
 namespace face_recognition_api.Repositories;
 
-// ทำตามสัญญาใน IUserRepository
-// ตอนนี้ใช้ in-memory list แทน DB ก่อน (เพิ่ม DB จริงทีหลัง)
+// Implements IUserRepository using an in-memory list (replace with real DB later)
 public class UserRepository : IUserRepository
 {
-    // จำลอง DB ด้วย List ไว้ก่อน
     private static readonly List<User> _users = new();
 
-    public Task<User?> GetByEmailAsync(string email)
+    public Task<User?> GetByEmpIdAsync(string empId)
     {
-        var user = _users.FirstOrDefault(u => u.Email == email);
+        var user = _users.FirstOrDefault(u => u.EmpId == empId);
         return Task.FromResult(user);
     }
 

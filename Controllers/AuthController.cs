@@ -15,14 +15,14 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
-    // POST /api/auth/login — เปิดให้ทุกคนที่มี account แล้ว
+    // POST /api/auth/login — open to anyone with an existing account
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
     {
         var response = await _authService.LoginAsync(request);
 
         if (response == null)
-            return Unauthorized(new { message = "Invalid email or password" });
+            return Unauthorized(new { message = "Invalid employee ID or password" });
 
         return Ok(response);
     }

@@ -1,6 +1,6 @@
 namespace face_recognition_api.DTOs;
 
-// สิ่งที่ Server ส่งกลับหลัง Login สำเร็จ
+// Payload returned by the server after a successful login
 public class LoginResponseDto
 {
     public string Token { get; set; } = string.Empty;

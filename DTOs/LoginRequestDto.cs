@@ -1,8 +1,8 @@
 namespace face_recognition_api.DTOs;
 
-// สิ่งที่ Client ส่งมาตอน Login
+// Payload sent by the client on login
 public class LoginRequestDto
 {
-    public string Email { get; set; } = string.Empty;
+    public string EmpId { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
 }

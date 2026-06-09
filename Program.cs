@@ -9,16 +9,30 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── 1. อ่าน JwtSettings จาก appsettings.json ──────────────────────────────
+// ── 1. Bind JwtSettings from appsettings.json ─────────────────────────────
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
 
-// ── 2. ลงทะเบียน Services ─────────────────────────────────────────────────
+// ── 2. Register Services ───────────────────────────────────────────────────
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddControllers();
 
-// ── 3. ตั้งค่า JWT Authentication ─────────────────────────────────────────
+// ── 3. Configure CORS ─────────────────────────────────────────────────────
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(
+                builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+                ?? new[] { "http://localhost:5173" }
+              )
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// ── 4. Configure JWT Authentication ───────────────────────────────────────
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -43,7 +57,7 @@ builder.Services.AddOpenApi();
 // ──────────────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
-// ── 4. Database Seed — สร้าง Admin คนแรกถ้ายังไม่มี ───────────────────────
+// ── 4. Database Seed — create first Admin account if none exists ───────────
 using (var scope = app.Services.CreateScope())
 {
     var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
@@ -55,12 +69,12 @@ using (var scope = app.Services.CreateScope())
 
         await userRepository.CreateAsync(new User
         {
-            Email = builder.Configuration["AdminSeed:Email"] ?? "admin@factory.com",
+            EmpId = builder.Configuration["AdminSeed:EmpId"] ?? "1111",
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
             Role = "Admin"
         });
 
-        Console.WriteLine("✅ Admin account created. Email: admin@factory.com");
+        Console.WriteLine("Admin account created. EmpId: 1111");
     }
 }
 
@@ -70,6 +84,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");  // ต้องอยู่ก่อน Authentication เสมอ
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

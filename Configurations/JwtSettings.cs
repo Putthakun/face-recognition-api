@@ -1,6 +1,6 @@
 namespace face_recognition_api.Configurations;
 
-// class นี้ map กับ "JwtSettings" ใน appsettings.json
+// Maps to the "JwtSettings" section in appsettings.json
 public class JwtSettings
 {
     public string SecretKey { get; set; } = string.Empty;

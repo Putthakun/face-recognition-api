@@ -7,7 +7,7 @@ namespace face_recognition_api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]  // All endpoints in this controller require Admin role
+[Authorize(Roles = "Admin")]
 public class AdminController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -27,19 +27,19 @@ public class AdminController : ControllerBase
         return Ok(response);
     }
 
-    // GET /api/admin/users — list all users
+    // GET /api/admin/users — list all employees with credentials
     [HttpGet("users")]
     public async Task<IActionResult> GetAllUsers()
     {
-        var users = await _userRepository.GetAllAsync();
+        var employees = await _userRepository.GetAllAsync();
 
-        // Map to anonymous object to prevent PasswordHash from leaking
-        var result = users.Select(u => new
+        var result = employees.Select(e => new
         {
-            u.Id,
-            u.EmpId,
-            u.Role,
-            u.CreatedAt
+            e.EmpId,
+            e.Name,
+            Role = e.Credential?.Role,
+            IsActive = e.Credential?.IsActive,
+            CreatedAt = e.Credential?.CreatedAt
         });
 
         return Ok(result);

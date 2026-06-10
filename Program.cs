@@ -1,10 +1,12 @@
 using System.Text;
 using face_recognition_api.Configurations;
+using face_recognition_api.Data;
 using face_recognition_api.Interfaces;
 using face_recognition_api.Models;
 using face_recognition_api.Repositories;
 using face_recognition_api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
 
-// ── 2. Register Services ───────────────────────────────────────────────────
+// ── 2. Register DbContext ──────────────────────────────────────────────────
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// ── 3. Register Services ───────────────────────────────────────────────────
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddControllers();
@@ -65,16 +71,18 @@ using (var scope = app.Services.CreateScope())
 
     if (!hasUsers)
     {
+        var adminEmpId = long.Parse(builder.Configuration["AdminSeed:EmpId"] ?? "1111");
         var adminPassword = builder.Configuration["AdminSeed:Password"] ?? "Admin@1234";
 
-        await userRepository.CreateAsync(new User
+        var employee = new Employee { EmpId = adminEmpId, Name = "Admin" };
+        var credential = new Credential
         {
-            EmpId = builder.Configuration["AdminSeed:EmpId"] ?? "1111",
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
             Role = "Admin"
-        });
+        };
 
-        Console.WriteLine("Admin account created. EmpId: 1111");
+        await userRepository.CreateAsync(employee, credential);
+        Console.WriteLine($"Admin account created. EmpId: {adminEmpId}");
     }
 }
 

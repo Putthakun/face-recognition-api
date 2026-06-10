@@ -42,6 +42,7 @@ publish/
 *.pfx
 *.p12
 appsettings.Production.json
+appsettings.Development.json
 appsettings.Local.json
 secrets.json
 

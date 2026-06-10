@@ -1,33 +1,45 @@
+using face_recognition_api.Data;
 using face_recognition_api.Interfaces;
 using face_recognition_api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace face_recognition_api.Repositories;
 
-// Implements IUserRepository using an in-memory list (replace with real DB later)
 public class UserRepository : IUserRepository
 {
-    private static readonly List<User> _users = new();
+    private readonly AppDbContext _db;
 
-    public Task<User?> GetByEmpIdAsync(string empId)
+    public UserRepository(AppDbContext db)
     {
-        var user = _users.FirstOrDefault(u => u.EmpId == empId);
-        return Task.FromResult(user);
+        _db = db;
     }
 
-    public Task<User> CreateAsync(User user)
+    public async Task<Credential?> GetByEmpIdAsync(long empId)
     {
-        user.Id = _users.Count + 1;
-        _users.Add(user);
-        return Task.FromResult(user);
+        return await _db.Credentials
+            .Include(c => c.Employee) // load Employee data alongside Credential
+            .FirstOrDefaultAsync(c => c.EmpId == empId && c.IsActive);
     }
 
-    public Task<List<User>> GetAllAsync()
+    public async Task CreateAsync(Employee employee, Credential credential)
     {
-        return Task.FromResult(_users.ToList());
+        _db.Employees.Add(employee);
+        await _db.SaveChangesAsync(); // save Employee first to get EmpId
+
+        credential.EmpId = employee.EmpId;
+        _db.Credentials.Add(credential);
+        await _db.SaveChangesAsync();
     }
 
-    public Task<bool> AnyAsync()
+    public async Task<List<Employee>> GetAllAsync()
     {
-        return Task.FromResult(_users.Any());
+        return await _db.Employees
+            .Include(e => e.Credential)
+            .ToListAsync();
+    }
+
+    public async Task<bool> AnyAsync()
+    {
+        return await _db.Credentials.AnyAsync();
     }
 }

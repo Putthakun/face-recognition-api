@@ -51,7 +51,7 @@ public class FaceRecognitionService : IFaceRecognitionService
 }
 
 // Maps to: { "face_detected": true, "embedding": [...] }
-file record EmbedResponse(
+internal record EmbedResponse(
     [property: JsonPropertyName("face_detected")] bool FaceDetected,
     [property: JsonPropertyName("embedding")]     float[]? Embedding
 );

@@ -31,12 +31,9 @@ public class AppDbContext : DbContext
             .Property(r => r.RoleId)
             .ValueGeneratedNever();
 
-        // Camera — manually set PK
+        // Camera — auto-generate PK
         modelBuilder.Entity<Camera>()
             .HasKey(c => c.CameraId);
-        modelBuilder.Entity<Camera>()
-            .Property(c => c.CameraId)
-            .ValueGeneratedNever();
 
         // EmployeeRole — composite primary key (emp_id, role_id)
         modelBuilder.Entity<EmployeeRole>()

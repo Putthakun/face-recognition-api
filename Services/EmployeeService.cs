@@ -10,13 +10,19 @@ public class EmployeeService : IEmployeeService
 {
     private readonly AppDbContext _db;
     private readonly IFaceRecognitionService _faceService;
+    private readonly IFaceVectorCacheService _cache;
     private readonly ILogger<EmployeeService> _logger;
 
-    public EmployeeService(AppDbContext db, IFaceRecognitionService faceService, ILogger<EmployeeService> logger)
+    public EmployeeService(
+        AppDbContext db,
+        IFaceRecognitionService faceService,
+        IFaceVectorCacheService cache,
+        ILogger<EmployeeService> logger)
     {
-        _db = db;
+        _db          = db;
         _faceService = faceService;
-        _logger = logger;
+        _cache       = cache;
+        _logger      = logger;
     }
 
     public async Task<EmployeeResponseDto> CreateAsync(CreateUserDto request)
@@ -48,7 +54,7 @@ public class EmployeeService : IEmployeeService
         if (credential != null) _db.Credentials.Add(credential);
         await _db.SaveChangesAsync();
 
-        // 3. Send photo to Face API and store embedding
+        // 3. Send photo to Face API → save vector to DB + Redis
         if (request.Photo != null)
         {
             var vector = await _faceService.GetEmbeddingAsync(request.Photo);
@@ -60,6 +66,7 @@ public class EmployeeService : IEmployeeService
                     FaceEmbeddedData = ConvertToBytes(vector)
                 });
                 await _db.SaveChangesAsync();
+                await _cache.SetAsync(request.EmpId, vector); // update Redis cache
             }
             else
             {
@@ -86,6 +93,7 @@ public class EmployeeService : IEmployeeService
 
         _db.Employees.Remove(employee);
         await _db.SaveChangesAsync();
+        await _cache.RemoveAsync(empId); // remove from Redis cache
         return true;
     }
 

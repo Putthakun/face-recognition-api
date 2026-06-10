@@ -5,10 +5,10 @@ using face_recognition_api.Interfaces;
 using face_recognition_api.Models;
 using face_recognition_api.Repositories;
 using face_recognition_api.Services;
-using face_recognition_api.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,10 +24,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<ICameraService, CameraService>();
 builder.Services.AddHttpClient<IFaceRecognitionService, FaceRecognitionService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["FaceApi:BaseUrl"] ?? "http://localhost:8000");
 });
+
+// Redis
+var redisConn = builder.Configuration["Redis:ConnectionString"] ?? "localhost:6379";
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect(redisConn));
+builder.Services.AddSingleton<IFaceVectorCacheService, FaceVectorCacheService>();
+
 builder.Services.AddControllers();
 
 // ── 3. Configure CORS ─────────────────────────────────────────────────────
@@ -91,6 +99,10 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"Admin account created. EmpId: {adminEmpId}");
     }
 }
+
+// Load face vectors from DB into Redis on startup
+var cacheService = app.Services.GetRequiredService<IFaceVectorCacheService>();
+await cacheService.LoadFromDbAsync();
 
 if (app.Environment.IsDevelopment())
 {

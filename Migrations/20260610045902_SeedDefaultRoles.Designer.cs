@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using face_recognition_api.Data;
 
@@ -11,9 +12,11 @@ using face_recognition_api.Data;
 namespace face_recognition_api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260610045902_SeedDefaultRoles")]
+    partial class SeedDefaultRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,7 +94,12 @@ namespace face_recognition_api.Migrations
                     b.Property<long>("RoleId")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("EmployeeEmpId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("EmpId", "RoleId");
+
+                    b.HasIndex("EmployeeEmpId");
 
                     b.HasIndex("RoleId");
 
@@ -112,12 +120,15 @@ namespace face_recognition_api.Migrations
                     b.Property<long>("EmpId")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("EmployeeEmpId")
+                        .HasColumnType("bigint");
+
                     b.Property<byte[]>("FaceEmbeddedData")
                         .HasColumnType("varbinary(max)");
 
                     b.HasKey("FaceEmbeddedId");
 
-                    b.HasIndex("EmpId");
+                    b.HasIndex("EmployeeEmpId");
 
                     b.ToTable("FaceEmbeddeds");
                 });
@@ -126,9 +137,6 @@ namespace face_recognition_api.Migrations
                 {
                     b.Property<long>("RoleId")
                         .HasColumnType("bigint");
-
-                    b.Property<bool>("IsSystem")
-                        .HasColumnType("bit");
 
                     b.Property<string>("RoleName")
                         .IsRequired()
@@ -142,13 +150,11 @@ namespace face_recognition_api.Migrations
                         new
                         {
                             RoleId = 1L,
-                            IsSystem = true,
                             RoleName = "Admin"
                         },
                         new
                         {
                             RoleId = 2L,
-                            IsSystem = true,
                             RoleName = "Supervisor"
                         });
                 });
@@ -164,24 +170,24 @@ namespace face_recognition_api.Migrations
                     b.Property<long?>("CameraId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("CameraId1")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("EmpId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("EmployeeEmpId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("TransactionId");
 
                     b.HasIndex("CameraId");
 
-                    b.HasIndex("CameraId1");
-
                     b.HasIndex("CreatedAt");
 
                     b.HasIndex("EmpId");
+
+                    b.HasIndex("EmployeeEmpId");
 
                     b.ToTable("Transactions");
                 });
@@ -201,7 +207,7 @@ namespace face_recognition_api.Migrations
                 {
                     b.HasOne("face_recognition_api.Models.Employee", "Employee")
                         .WithMany("EmployeeRoles")
-                        .HasForeignKey("EmpId")
+                        .HasForeignKey("EmployeeEmpId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -220,7 +226,7 @@ namespace face_recognition_api.Migrations
                 {
                     b.HasOne("face_recognition_api.Models.Employee", "Employee")
                         .WithMany("FaceEmbeddeds")
-                        .HasForeignKey("EmpId")
+                        .HasForeignKey("EmployeeEmpId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -230,16 +236,12 @@ namespace face_recognition_api.Migrations
             modelBuilder.Entity("face_recognition_api.Models.Transaction", b =>
                 {
                     b.HasOne("face_recognition_api.Models.Camera", "Camera")
-                        .WithMany()
-                        .HasForeignKey("CameraId");
-
-                    b.HasOne("face_recognition_api.Models.Camera", null)
                         .WithMany("Transactions")
-                        .HasForeignKey("CameraId1");
+                        .HasForeignKey("CameraId");
 
                     b.HasOne("face_recognition_api.Models.Employee", "Employee")
                         .WithMany("Transactions")
-                        .HasForeignKey("EmpId");
+                        .HasForeignKey("EmployeeEmpId");
 
                     b.Navigation("Camera");
 

@@ -48,10 +48,40 @@ public class AppDbContext : DbContext
             .WithOne(e => e.Credential)
             .HasForeignKey<Credential>(c => c.EmpId);
 
-        // Transaction — index on emp_id and created_at for fast queries
+        // FaceEmbedded — many-to-one with Employee (explicit FK)
+        modelBuilder.Entity<FaceEmbedded>()
+            .HasOne(f => f.Employee)
+            .WithMany(e => e.FaceEmbeddeds)
+            .HasForeignKey(f => f.EmpId);
+
+        // EmployeeRole — explicit FK to Employee and Role
+        modelBuilder.Entity<EmployeeRole>()
+            .HasOne(er => er.Employee)
+            .WithMany(e => e.EmployeeRoles)
+            .HasForeignKey(er => er.EmpId);
+        modelBuilder.Entity<EmployeeRole>()
+            .HasOne(er => er.Role)
+            .WithMany(r => r.EmployeeRoles)
+            .HasForeignKey(er => er.RoleId);
+
+        // Transaction — explicit FK + index
+        modelBuilder.Entity<Transaction>()
+            .HasOne(t => t.Employee)
+            .WithMany(e => e.Transactions)
+            .HasForeignKey(t => t.EmpId);
+        modelBuilder.Entity<Transaction>()
+            .HasOne(t => t.Camera)
+            .WithMany()
+            .HasForeignKey(t => t.CameraId);
         modelBuilder.Entity<Transaction>()
             .HasIndex(t => t.EmpId);
         modelBuilder.Entity<Transaction>()
             .HasIndex(t => t.CreatedAt);
+
+        // Seed default roles
+        modelBuilder.Entity<Role>().HasData(
+            new Role { RoleId = 1, RoleName = "Admin",      IsSystem = true  },
+            new Role { RoleId = 2, RoleName = "Supervisor", IsSystem = true  }
+        );
     }
 }

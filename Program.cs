@@ -5,6 +5,7 @@ using face_recognition_api.Interfaces;
 using face_recognition_api.Models;
 using face_recognition_api.Repositories;
 using face_recognition_api.Services;
+using face_recognition_api.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,6 +23,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // ── 3. Register Services ───────────────────────────────────────────────────
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddHttpClient<IFaceRecognitionService, FaceRecognitionService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["FaceApi:BaseUrl"] ?? "http://localhost:8000");
+});
 builder.Services.AddControllers();
 
 // ── 3. Configure CORS ─────────────────────────────────────────────────────
@@ -92,7 +98,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowFrontend");  // ต้องอยู่ก่อน Authentication เสมอ
+app.UseCors("AllowFrontend");  // must be before Authentication
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

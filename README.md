@@ -121,7 +121,7 @@ Employee create/update return a `400 { message, field: "photo" }` if the uploade
 - .NET 10 SDK
 - SQL Server (or Azure SQL Edge via Docker)
 - Redis
-- A running [`face-recognition-server`](../face-recognition-server) instance (for face embedding extraction)
+- A running [`face-recognition-server`](https://github.com/Putthakun/face-recognition-server) instance (for face embedding extraction)
 
 ### Configuration
 
@@ -166,11 +166,11 @@ docker run -p 8080:8080 --env-file .env face-recognition-api
 
 ## Related Services
 
-This API is part of a larger system. See [`real-time-face-recognition-attendance-system`](../real-time-face-recognition-attendance-system) for the full architecture overview.
+This API is part of a larger system. See [`real-time-face-recognition-attendance-system`](https://github.com/Putthakun/real-time-face-recognition-attendance-system) for the full architecture overview.
 
 | Repo | Role |
 |---|---|
-| [`face-recognition-edge`](../face-recognition-edge) | Captures video, detects faces (YOLOv8), publishes crops to RabbitMQ |
-| [`face-recognition-server`](../face-recognition-server) | Matches faces against cached embeddings (InsightFace), records transactions via this API |
-| [`face-recognition-web`](../face-recognition-web) | Vue 3 dashboard for admins/supervisors, consumes this API |
-| [`face-recognition-infra`](../face-recognition-infra) | Shared SQL Server, Redis, RabbitMQ via Docker Compose |
+| [`face-recognition-edge`](https://github.com/Putthakun/face-recognition-edge) | Captures video, detects faces (YOLOv8), publishes crops to RabbitMQ |
+| [`face-recognition-server`](https://github.com/Putthakun/face-recognition-server) | Matches faces against cached embeddings (InsightFace), records transactions via this API |
+| [`face-recognition-web`](https://github.com/Putthakun/face-recognition-web) | Vue 3 dashboard for admins/supervisors, consumes this API |
+| [`face-recognition-infra`](https://github.com/Putthakun/face-recognition-infrastructure) | Shared SQL Server, Redis, RabbitMQ via Docker Compose |

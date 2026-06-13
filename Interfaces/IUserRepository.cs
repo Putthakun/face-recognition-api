@@ -6,6 +6,5 @@ public interface IUserRepository
 {
     Task<Credential?> GetByEmpIdAsync(long empId);
     Task CreateAsync(Employee employee, Credential credential);
-    Task<List<Employee>> GetAllAsync();
     Task<bool> AnyAsync();
 }

@@ -35,30 +35,6 @@ public class AuthService : IAuthService
         return GenerateToken(credential);
     }
 
-    public async Task<LoginResponseDto> CreateUserAsync(CreateUserDto request)
-    {
-        // 1. Create Employee record
-        var employee = new Employee
-        {
-            EmpId = request.EmpId,
-            Name = request.Name
-        };
-
-        // 2. Create Credential record with hashed password
-        var credential = new Credential
-        {
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-            Role = request.Role
-        };
-
-        // 3. Persist both to DB
-        await _userRepository.CreateAsync(employee, credential);
-
-        // 4. Reload credential with employee data for token generation
-        credential.Employee = employee;
-        return GenerateToken(credential);
-    }
-
     private LoginResponseDto GenerateToken(Credential credential)
     {
         var expiresAt = DateTime.UtcNow.AddHours(_jwtSettings.ExpiresInHours);

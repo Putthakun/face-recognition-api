@@ -5,5 +5,4 @@ namespace face_recognition_api.Interfaces;
 public interface IAuthService
 {
     Task<LoginResponseDto?> LoginAsync(LoginRequestDto request);
-    Task<LoginResponseDto> CreateUserAsync(CreateUserDto request);
 }

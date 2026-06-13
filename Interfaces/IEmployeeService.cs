@@ -6,5 +6,6 @@ public interface IEmployeeService
 {
     Task<EmployeeResponseDto> CreateAsync(CreateUserDto request);
     Task<List<EmployeeResponseDto>> GetAllAsync();
+    Task<EmployeeResponseDto?> UpdateAsync(long empId, UpdateUserDto request);
     Task<bool> DeleteAsync(long empId);
 }

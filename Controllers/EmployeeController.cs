@@ -1,4 +1,5 @@
 using face_recognition_api.DTOs;
+using face_recognition_api.Exceptions;
 using face_recognition_api.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,10 @@ public class EmployeeController : ControllerBase
         {
             return Conflict(new { message = ex.Message });
         }
+        catch (FaceNotDetectedException ex)
+        {
+            return BadRequest(new { message = ex.Message, field = "photo" });
+        }
     }
 
     // GET /api/admin/employees
@@ -38,6 +43,23 @@ public class EmployeeController : ControllerBase
     {
         var result = await _employeeService.GetAllAsync();
         return Ok(result);
+    }
+
+    // PUT /api/admin/employees/{empId}  (multipart/form-data)
+    // All fields optional — only provided fields are updated
+    [HttpPut("{empId}")]
+    public async Task<IActionResult> Update(long empId, [FromForm] UpdateUserDto request)
+    {
+        try
+        {
+            var result = await _employeeService.UpdateAsync(empId, request);
+            if (result == null) return NotFound(new { message = $"Employee {empId} not found" });
+            return Ok(result);
+        }
+        catch (FaceNotDetectedException ex)
+        {
+            return BadRequest(new { message = ex.Message, field = "photo" });
+        }
     }
 
     // DELETE /api/admin/employees/{empId}

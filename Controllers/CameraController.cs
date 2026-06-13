@@ -40,6 +40,15 @@ public class CameraController : ControllerBase
         return Ok(result);
     }
 
+    // PUT /api/admin/cameras/{cameraId}
+    [HttpPut("{cameraId}")]
+    public async Task<IActionResult> Update(long cameraId, [FromBody] UpdateCameraDto request)
+    {
+        var result = await _cameraService.UpdateAsync(cameraId, request);
+        if (result == null) return NotFound(new { message = $"Camera {cameraId} not found" });
+        return Ok(result);
+    }
+
     // DELETE /api/admin/cameras/{cameraId}
     [HttpDelete("{cameraId}")]
     public async Task<IActionResult> Delete(long cameraId)

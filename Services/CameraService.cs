@@ -34,6 +34,18 @@ public class CameraService : ICameraService
         return cameras.Select(MapToDto).ToList();
     }
 
+    public async Task<CameraResponseDto?> UpdateAsync(long cameraId, UpdateCameraDto request)
+    {
+        var camera = await _db.Cameras.FindAsync(cameraId);
+        if (camera == null) return null;
+
+        if (!string.IsNullOrWhiteSpace(request.Location))
+            camera.Location = request.Location;
+
+        await _db.SaveChangesAsync();
+        return MapToDto(camera);
+    }
+
     public async Task<bool> DeleteAsync(long cameraId)
     {
         var camera = await _db.Cameras.FindAsync(cameraId);

@@ -31,13 +31,6 @@ public class UserRepository : IUserRepository
         await _db.SaveChangesAsync();
     }
 
-    public async Task<List<Employee>> GetAllAsync()
-    {
-        return await _db.Employees
-            .Include(e => e.Credential)
-            .ToListAsync();
-    }
-
     public async Task<bool> AnyAsync()
     {
         return await _db.Credentials.AnyAsync();
